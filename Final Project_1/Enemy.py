@@ -28,7 +28,7 @@ class Enemy:
         
     #method checks enemy health
     def checkHealth(self):
-        if self__Health <= 0:
+        if self.__Health <= 0:
             print("Enemy is Dead")
         else:
             print("Life remaining: "+str(self.__Health))
