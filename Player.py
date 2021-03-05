@@ -1,116 +1,135 @@
-"""
+import pygame
 
-Paige's Completion
-==========================
-Background - 3/1/2020
-Player sprite - 3/1/2020
-Friend Sprite - 3/1/2020
-New item Laser - 3/1/2020
-
-
-Jumping Method - In Progess
-Player Class - In Progress
-Rocketship Sprite - In Progress
-Ground Environment - In Progress
-
-"""
 
 #PLAYER CLASS
 class Player:
 
-    def __init__(self, X, Y):
-        #draws player on to screen
-        self.__playerX = X
-        self.__playerY = Y
+    #(object, screen to draw on, image of the player, X coord to place image, Y coord to place image)
+    def __init__(self, gameScreen, PlayerRight, PlayerLeft, X, Y):
+
+        #Get the game sceen
+        self.screen = gameScreen
+        #get attributes of the screen
+        self.screenInfo = pygame.display.Info()
+        self.screen_h = self.screenInfo.current_h
+        self.screen_w = self.screenInfo.current_w
+        #print screen object attributes
+        print(self.screen_h)
+        print(self.screen_w)
+
+        #Player Images
+        #===================================================================================
+        #index and counter for player animation
+        self.index = 0
+        self.counter = 0
+
+        #how fast the list is iterated for player images
+        self.animeSpeed = 2
+
+        #keeps track of the direciton
+        self.animeDirection = 0
+
+        #right and left direction image lists
+        self.PlayerR = PlayerRight
+        self.PlayerL = PlayerLeft
+
+        #image used for the player
+        self.player_img = self.PlayerR[self.index]
+
+        #create a rectangle out of the player
+        self.rect = self.player_img.get_rect()
+
+        #initial cooridnates to draw player on to screen
+        self.rect.x = X
+        self.rect.y = Y
+
+        #width and hight of the images
+        self.width = self.player_img.get_width()
+        self.height = self.player_img.get_height()
+        #====================================================================================
+
+        #var used for player jump speed
+        self.jump = 0
 
         #screen.blit("player img goes here" (x, y))
         self.__setHealth = 3
 
-        # isJump and jumpCount attributes
-        self.isJump = False
-        self.jumpCount = 10
-
     #get player x coord
     def get_PlayerX(self):
-        return (self.__playerX)
-        
+        return (self.rect.x)
+
     #get player Y Coord
     def get_PlayerY(self):
-        return (self.__playerY)
+        return (self.rect.y)
 
-    #move player right
     def Player_Right(self):
-        self.__playerX += 10
+        if self.rect.right > self.screen_w:
+            self.rect.right = self.screen_w
+        self.rect.x += 15
+        #counter used for animation
+        self.counter += 1
+        #Set the direction the image is walking
+        self.animeDirection = 1
 
-    #move player left
     def Player_Left(self):
-        self.__playerX -= 10
+        if self.rect.left < 0:
+            self.rect.left = 0
 
-""""
-    def jump(self):
-      velx = 10
-      vely = 10
-      jump = False
+        self.rect.x -= 15
+        #counter used for animation
+        self.counter += 1
+        #Set the direction the image is walking
+        self.animeDirection = -1
 
-      if jump is False and userinput[pygame.K_UP]:
-        jump = True
+    def Player_Jump(self):
+        #JUMP NEEDS WORK
+        self.jump = -20
+        self.rect.y += self.jump
 
-      if jump is True:
-        y -= vely
-        vely -= 1
-      if y < -10:
-        jump = False
-        vely = 10
-        
-"""
-""""
-    def Player_Ground(self):
-        return 0
-    #USED TO CHECK IF THE PLAYER IS ON GROUND
+        print("Player Y: " + str(self.rect.y) + "Jump height: " +
+              str(self.jump))
 
-  """
-""""
-  #update health
-  def getHealth(self):
-    if self.getHealth <= 0:
-      print("Player Dead")
-    else: 
-      print("Life remaining: " + str(self.setHealth))
+    def Player_Gravity(self):
 
-  #player movement left
-  def playerMoveleft(self, x, y):
-    event.key == pygame.K_LEFT:
-    rate of change
-    playerX_change = -0.3
-
-  #player movement right
-  def playerMoveright():
-    event.key == pygame.K_RIGHT:
-    #rate of change
-    playerX_change = 0.3
-
-  #player jump controls
-  def jumpRange(self, x, y):
-    event.type == pygame.KEYUP
-    playerX_change = 4
+        #Boundries
+        #==================================================================
+        #Stops player from falling off the screen
+        if self.rect.bottom >= self.screen_h:
+            self.rect.bottom = self.screen_h
+        #Stops player from jumping off screen
+        if self.rect.top < 0:
+            self.rect.top = 0
 
 
-  #basic laser
-  def setWeapon(self):
-    #screen.blit("player img with BASIC laser goes here" (x, y))
+#==================================================================
 
-  #new laser
-  def getWeapon(self):
-    #screen.blit("player img with NEW laser goes here" (x, y))
+#Gravity pull
+        self.jump += 1
+        if self.jump > 10:
+            self.jump = 10
+        self.rect.y += self.jump
 
-  #laser movement
-  def shootLaser(self):
-    global laser_state
-    laser_state = "fire"
-    event.key == pygame.K_SPACE:
-    fire_laser(playerX,laserY)
-    #screen.blit("laser img goes here", (x+"#", y+"#"))
+    #draw player on screen
+    def draw(self):
 
-  #sound (SAL)
-  #def sound():
-  """
+        #handle animation steps
+        if self.counter > self.animeSpeed:
+            self.counter = 0
+            self.index += 1
+            if self.index >= len(self.PlayerR):
+                self.index = 0
+            if self.animeDirection == 1:
+                self.player_img = self.PlayerR[self.index]
+                print("Player Direction X: " + str(self.animeDirection) +
+                      " PlayerR Index: " + str(self.index) +
+                      " PlayerR Counter: " + str(self.counter))
+            if self.animeDirection == -1:
+                self.player_img = self.PlayerL[self.index]
+                print("Player Direction X: " + str(self.animeDirection) +
+                      " PlayerL Index: " + str(self.index) +
+                      " PlayerL Counter: " + str(self.counter))
+
+        #draws image
+        self.screen.blit(self.player_img, self.rect)
+        #temp draw rectangle
+        #pygame.draw.rect(self.screen,(255,255,255),self.rect,5)
